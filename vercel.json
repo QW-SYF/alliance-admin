@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [
     {
-      "src": "server-fixed.js",
+      "src": "server.js",
       "use": "@vercel/node"
     },
     {
@@ -13,7 +13,7 @@
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "/server-fixed.js"
+      "dest": "/server.js"
     },
     {
       "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|ico|svg))",
@@ -21,7 +21,8 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/server-fixed.js"
+      "dest": "/server.js"
     }
   ]
 }
+
