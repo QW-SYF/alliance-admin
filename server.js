@@ -21,7 +21,7 @@ let sessionConfig = {
     secure: isVercel ? true : false, // Vercel 使用 HTTPS
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000,
-    sameSite: isVercel ? 'none' : 'lax' // 跨域设置
+    sameSite: 'lax' // 修改为 lax，none 在某些环境下会有问题
   },
   name: 'admin_session'
 };
@@ -61,8 +61,9 @@ app.use(express.urlencoded({ extended: true }));
 // 会话配置
 app.use(session(sessionConfig));
 
-// 静态文件服务
-app.use(express.static(path.join(__dirname, 'public')));
+// 静态文件服务 - Vercel 兼容
+const publicPath = isVercel ? path.join(__dirname, 'public') : path.join(__dirname, 'public');
+app.use(express.static(publicPath));
 
 // 模拟管理员账户（实际项目中应从数据库读取）
 const ADMIN_ACCOUNTS = [
@@ -258,7 +259,9 @@ app.use((req, res) => {
 // Vercel 导出和本地启动
 if (isVercel) {
   // Vercel 环境导出 app
-  module.exports = app;
+  module.exports = (req, res) => {
+    app(req, res);
+  };
 } else {
   // 本地开发环境启动服务器
   const PORT = process.env.PORT || 3000;
@@ -275,7 +278,7 @@ if (isVercel) {
       console.log(`🌐 云开发环境: ${process.env.WX_CLOUD_ENV}`);
     } else {
       console.log('💡 提示：当前使用模拟数据进行演示');
-      console.log('🔧 要连接真实数据库，请配置有效的 WX_SECRET 环境变量');
+      console.log('🔧 要连接真实数据库，请配置有效的 WX_SECRET 环境变量`);
     }
   });
 }
